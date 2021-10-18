@@ -12,8 +12,8 @@ namespace PixelStacker.Logic.Collections
     {
         bool IsSeeded();
         void SetSeedData(List<MaterialCombination> combos, MaterialPalette mats, bool isSideView);
-        MaterialCombination FindBestMatch(Color c);
-        List<MaterialCombination> FindBestMatches(Color c, int maxMatches);
+        MaterialCombination FindBestMatch(ColorData c);
+        List<MaterialCombination> FindBestMatches(ColorData c, int maxMatches);
 
         /// <summary>
         /// 0-100 how accurate this is when compared to the SeparateColorBruteForce algorithm.

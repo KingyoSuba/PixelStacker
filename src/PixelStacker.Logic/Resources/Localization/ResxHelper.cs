@@ -1,10 +1,22 @@
 ﻿using Newtonsoft.Json;
+using SkiaSharp;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Reflection;
 using System.Resources;
 using System.Text;
 using System.Threading;
+
+namespace PixelStacker.Resources
+{
+    public static class ResxHelperExtensions
+    {
+        public static SkiaSharp.SKBitmap ToImage(this byte[] data)
+        {
+            return SKBitmap.Decode(data);
+        }
+    }
+}
 
 namespace PixelStacker.Resources.Localization
 {

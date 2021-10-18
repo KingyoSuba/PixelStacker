@@ -13,7 +13,7 @@ namespace PixelStacker.Logic.IO.Formatters
         public async Task ExportAsync(string filePath, RenderedCanvas canvas, CancellationToken? worker = null)
         {
             Dictionary<Material, int> materialCounts = new Dictionary<Material, int>();
-            bool isv = canvas.CanvasData.IsSideView;
+            bool isv = canvas.IsSideView;
             var data = canvas.CanvasData;
             var Palette = canvas.MaterialPalette;
             bool isMultilayer = data.Any(x => Palette[x.PaletteID].IsMultiLayer);

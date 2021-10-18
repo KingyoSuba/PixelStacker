@@ -10,7 +10,7 @@ namespace PixelStacker.Logic.Collections.ColorMapper
 {
     public class AverageColorBruteForceMapper : IColorMapper
     {
-        private Dictionary<Color, MaterialCombination> Cache { get; set; } = new Dictionary<Color, MaterialCombination>();
+        private Dictionary<ColorData, MaterialCombination> Cache { get; set; } = new Dictionary<ColorData, MaterialCombination>();
         public List<MaterialCombination> Combos { get; private set; }
         public bool IsSideView { get; private set; }
         public MaterialPalette Palette { get; private set; }
@@ -22,13 +22,13 @@ namespace PixelStacker.Logic.Collections.ColorMapper
         public void SetSeedData(List<MaterialCombination> combos,  MaterialPalette mats, bool isSideView)
         {
             this.Cache = null;
-            this.Cache = new Dictionary<Color, MaterialCombination>();
+            this.Cache = new Dictionary<ColorData, MaterialCombination>();
             this.Combos = combos;
             this.IsSideView = isSideView;
             this.Palette = mats;
         }
 
-        public MaterialCombination FindBestMatch(Color c)
+        public MaterialCombination FindBestMatch(ColorData c)
         {
             if (Cache.TryGetValue(c, out MaterialCombination mc))
             {
@@ -47,7 +47,7 @@ namespace PixelStacker.Logic.Collections.ColorMapper
         /// <param name="c"></param>
         /// <param name="maxMatches"></param>
         /// <returns></returns>
-        public List<MaterialCombination> FindBestMatches(Color c, int maxMatches)
+        public List<MaterialCombination> FindBestMatches(ColorData c, int maxMatches)
         {
             if (c.A < 32) return new List<MaterialCombination>() { Palette[Constants.MaterialCombinationIDForAir] };
             var found = Combos.OrderBy(x => x.GetAverageColor(IsSideView).GetColorDistance(c))

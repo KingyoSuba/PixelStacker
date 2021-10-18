@@ -74,65 +74,65 @@ namespace PixelStacker.Extensions
             return output.Where(x => x.Any()).ToList();
         }
 
-        public static TSource MaxBy<TSource, TKey>(this IEnumerable<TSource> source, Func<TSource, TKey> selector)
-        {
-            return source.MaxBy(selector, Comparer<TKey>.Default);
-        }
+        //public static TSource MaxBy<TSource, TKey>(this IEnumerable<TSource> source, Func<TSource, TKey> selector)
+        //{
+        //    return source.MaxBy(selector, Comparer<TKey>.Default);
+        //}
 
-        public static T MaxBy<T, TKey>(this IEnumerable<T> source, Func<T, TKey> selector, IComparer<TKey> comparer)
-        {
-            using (IEnumerator<T> sourceIterator = source.GetEnumerator())
-            {
-                if (!sourceIterator.MoveNext()) throw new InvalidOperationException("Sequence was empty");
+        //public static T MaxBy<T, TKey>(this IEnumerable<T> source, Func<T, TKey> selector, IComparer<TKey> comparer)
+        //{
+        //    using (IEnumerator<T> sourceIterator = source.GetEnumerator())
+        //    {
+        //        if (!sourceIterator.MoveNext()) throw new InvalidOperationException("Sequence was empty");
                 
-                T max = sourceIterator.Current;
-                TKey maxKey = selector.Invoke(max);
+        //        T max = sourceIterator.Current;
+        //        TKey maxKey = selector.Invoke(max);
 
-                while (sourceIterator.MoveNext())
-                {
-                    T candidate = sourceIterator.Current;
-                    TKey candidateProjected = selector.Invoke(candidate);
+        //        while (sourceIterator.MoveNext())
+        //        {
+        //            T candidate = sourceIterator.Current;
+        //            TKey candidateProjected = selector.Invoke(candidate);
 
-                    if (comparer.Compare(candidateProjected, maxKey) > 0)
-                    {
-                        max = candidate;
-                        maxKey = candidateProjected;
-                    }
-                }
+        //            if (comparer.Compare(candidateProjected, maxKey) > 0)
+        //            {
+        //                max = candidate;
+        //                maxKey = candidateProjected;
+        //            }
+        //        }
 
-                return max;
-            }
-        }
+        //        return max;
+        //    }
+        //}
 
 
-        public static TSource MinBy<TSource, TKey>(this IEnumerable<TSource> source, Func<TSource, TKey> selector)
-        {
-            return source.MinBy(selector, Comparer<TKey>.Default);
-        }
+        //public static TSource MinBy<TSource, TKey>(this IEnumerable<TSource> source, Func<TSource, TKey> selector)
+        //{
+        //    return source.MinBy(selector, Comparer<TKey>.Default);
+        //}
 
-        public static T MinBy<T, TKey>(this IEnumerable<T> source, Func<T, TKey> selector, IComparer<TKey> comparer)
-        {
-            using (IEnumerator<T> sourceIterator = source.GetEnumerator())
-            {
-                if (!sourceIterator.MoveNext()) throw new InvalidOperationException("Sequence was empty");
+        //public static T MinBy<T, TKey>(this IEnumerable<T> source, Func<T, TKey> selector, IComparer<TKey> comparer)
+        //{
+        //    using (IEnumerator<T> sourceIterator = source.GetEnumerator())
+        //    {
+        //        if (!sourceIterator.MoveNext()) throw new InvalidOperationException("Sequence was empty");
 
-                T min = sourceIterator.Current;
-                TKey minKey = selector.Invoke(min);
+        //        T min = sourceIterator.Current;
+        //        TKey minKey = selector.Invoke(min);
 
-                while (sourceIterator.MoveNext())
-                {
-                    T candidate = sourceIterator.Current;
-                    TKey candidateProjected = selector.Invoke(candidate);
+        //        while (sourceIterator.MoveNext())
+        //        {
+        //            T candidate = sourceIterator.Current;
+        //            TKey candidateProjected = selector.Invoke(candidate);
 
-                    if (comparer.Compare(candidateProjected, minKey) < 0)
-                    {
-                        min = candidate;
-                        minKey = candidateProjected;
-                    }
-                }
+        //            if (comparer.Compare(candidateProjected, minKey) < 0)
+        //            {
+        //                min = candidate;
+        //                minKey = candidateProjected;
+        //            }
+        //        }
 
-                return min;
-            }
-        }
+        //        return min;
+        //    }
+        //}
     }
 }

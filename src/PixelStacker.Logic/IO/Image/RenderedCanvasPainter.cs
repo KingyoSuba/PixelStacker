@@ -3,6 +3,7 @@ using PixelStacker.IO.Config;
 using PixelStacker.IO.Image;
 using PixelStacker.Logic.Model;
 using PixelStacker.Logic.Utilities;
+using SkiaSharp;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -26,12 +27,12 @@ namespace PixelStacker.Logic
         /// 1 = 1/2 size
         /// 2 = 1/4 size
         /// 3 = 1/8 size
-        public List<Bitmap[,]> Bitmaps { get; }
+        public List<SKBitmap[,]> Bitmaps { get; }
 
         public RenderedCanvasPainter(RenderedCanvas data)
         {
             this.Data = data;
-            this.Bitmaps = new List<Bitmap[,]>();
+            this.Bitmaps = new List<SKBitmap[,]>();
         }
 
         private static Size[,] CalculateChunkSizesForLayer(Size srcImageSize, int scaleDivide)
@@ -85,13 +86,13 @@ namespace PixelStacker.Logic
             return sizesList;
         }
 
-        private static Bitmap RenderLayer0Image(RenderedCanvas data, Rectangle srcTile, Rectangle dstTile)
+        private static SKBitmap RenderLayer0Image(RenderedCanvas data, Rectangle srcTile, Rectangle dstTile)
         {
-            var bm = new Bitmap(dstTile.Width, dstTile.Height, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+            var bm = new SKBitmap(dstTile.Width, dstTile.Height, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
             var bmc = new AsyncBitmapWrapper(bm);
             int scaleDivide = dstTile.Width / srcTile.Width;
 
-            bool isv = data.CanvasData.IsSideView;
+            bool isv = data.IsSideView;
             int srcWidth = srcTile.Width;
             int srcHeight = srcTile.Height;
             Parallel.For(0, srcHeight, (y) =>
@@ -252,7 +253,7 @@ namespace PixelStacker.Logic
             #endregion SET GRAPHICS SETTINGS
 
             #region GET BITMAP SET
-            List<Bitmap[,]> bitmaps = this.Bitmaps;
+            List<SKBitmap[,]> bitmaps = this.Bitmaps;
             if (bitmaps == null || bitmaps.Count == 0)
             {
 #if !RELEASE
@@ -262,7 +263,7 @@ namespace PixelStacker.Logic
 #endif
             }
 
-            Bitmap[,] toUse = bitmaps[0];
+            SKBitmap[,] toUse = bitmaps[0];
             int divideAmount = 1;
             int i = 1;
             while (pz.zoomLevel <= 10.0D / divideAmount / Constants.SMALL_IMAGE_DIVIDE_SIZE && i < bitmaps.Count)

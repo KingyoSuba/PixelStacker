@@ -22,6 +22,8 @@ namespace PixelStacker.UI
         private IColorMapper ColorMapper;
         private MaterialPalette Palette;
         public Bitmap LoadedImage { get; private set; } = UIResources.elsa_cropped.To32bppBitmap();
+        public Bitmap PreprocessedImage => this.LoadedImage.To32bppBitmap();
+
         private RenderedCanvas RenderedCanvas;
         private KonamiWatcher konamiWatcher;
 

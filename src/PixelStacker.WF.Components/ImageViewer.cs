@@ -1,5 +1,6 @@
 ﻿using PixelStacker.Extensions;
 using PixelStacker.IO.Config;
+using SkiaSharp;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -45,17 +46,17 @@ namespace PixelStacker.WF.Components
         {
             this.DoubleBuffered = true;
             InitializeComponent();
-            this.BackgroundImage = Resources.UIResources.bg_imagepanel;
+            this.BackgroundImage = new Bitmap(typeof(Resources.UIResources), nameof(Resources.UIResources.bg_imagepanel));
             this.PanZoomSettings = CalculateInitialPanZoomSettings(null);
         }
 
-        public void SetImage(Bitmap src, PanZoomSettings pz = null)
+        public void SetImage(SKBitmap src, PanZoomSettings pz = null)
         {
-            Image.DisposeSafely();
-            Image = null;
-            Image = src.To32bppBitmap();
-            bool preserveZoom = pz != null;
-            if (!preserveZoom) this.PanZoomSettings = CalculateInitialPanZoomSettings(Image);
+            //Image.DisposeSafely();
+            //Image = null;
+            //Image = src.To32bppBitmap();
+            //bool preserveZoom = pz != null;
+            //if (!preserveZoom) this.PanZoomSettings = CalculateInitialPanZoomSettings(Image);
             Refresh(); // Trigger repaint
         }
 
@@ -109,52 +110,52 @@ namespace PixelStacker.WF.Components
         {
             base.OnPaint(e);
 
-            Graphics g = e.Graphics;
-            g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.NearestNeighbor;
-            g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.None;
-            g.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.Half;
+            //Graphics g = e.Graphics;
+            //g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.NearestNeighbor;
+            //g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.None;
+            //g.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.Half;
 
-            if (this.DesignMode && this.BackgroundImage != null)
-            {
-                using Brush bgBrush = new TextureBrush(Resources.UIResources.bg_imagepanel);
-                g.FillRectangle(bgBrush, 0, 0, this.Width, this.Height);
-            }
+            //if (this.DesignMode && this.BackgroundImage != null)
+            //{
+            //    using Brush bgBrush = new TextureBrush(Resources.UIResources.bg_imagepanel);
+            //    g.FillRectangle(bgBrush, 0, 0, this.Width, this.Height);
+            //}
 
-            // Render the image they are looking at.
-            var pz = this.PanZoomSettings;
-            var img = this.Image;
+            //// Render the image they are looking at.
+            //var pz = this.PanZoomSettings;
+            //var img = this.Image;
 
-            if (img != null && pz != null)
-            {
-                Point pStart = GetPointOnImage(new Point(0, 0), EstimateProp.Floor);
-                Point fStart = GetPointOnPanel(pStart);
-                int divideAmount = 1;
-                int ts = 1;
-                pStart.X *= ts; pStart.X /= divideAmount;
-                pStart.Y *= ts; pStart.Y /= divideAmount;
+            //if (img != null && pz != null)
+            //{
+            //    Point pStart = GetPointOnImage(new Point(0, 0), EstimateProp.Floor);
+            //    Point fStart = GetPointOnPanel(pStart);
+            //    int divideAmount = 1;
+            //    int ts = 1;
+            //    pStart.X *= ts; pStart.X /= divideAmount;
+            //    pStart.Y *= ts; pStart.Y /= divideAmount;
 
-                Point pEnd = GetPointOnImage(new Point(this.Width, this.Height), EstimateProp.Ceil);
-                Point fEnd = GetPointOnPanel(pEnd);
-                pEnd.X *= ts; pEnd.X /= divideAmount;
-                pEnd.Y *= ts; pEnd.Y /= divideAmount;
+            //    Point pEnd = GetPointOnImage(new Point(this.Width, this.Height), EstimateProp.Ceil);
+            //    Point fEnd = GetPointOnPanel(pEnd);
+            //    pEnd.X *= ts; pEnd.X /= divideAmount;
+            //    pEnd.Y *= ts; pEnd.Y /= divideAmount;
 
-                Rectangle rectSRC = new Rectangle(pStart, pStart.CalculateSize(pEnd));
-                Rectangle rectDST = new Rectangle(fStart, fStart.CalculateSize(fEnd));
+            //    Rectangle rectSRC = new Rectangle(pStart, pStart.CalculateSize(pEnd));
+            //    Rectangle rectDST = new Rectangle(fStart, fStart.CalculateSize(fEnd));
 
-                lock (img)
-                {
-                    double origW = img.Width;
-                    double origH = img.Height;
-                    int w = (int)(origW * this.PanZoomSettings.zoomLevel);
-                    int h = (int)(origH * this.PanZoomSettings.zoomLevel);
+            //    lock (img)
+            //    {
+            //        double origW = img.Width;
+            //        double origH = img.Height;
+            //        int w = (int)(origW * this.PanZoomSettings.zoomLevel);
+            //        int h = (int)(origH * this.PanZoomSettings.zoomLevel);
 
-                    g.DrawImage(image: img,
-                        srcRect: rectSRC,
-                        destRect: rectDST,
-                        srcUnit: GraphicsUnit.Pixel);
-                    //g.DrawImage(img, pz.imageX, pz.imageY, w + 1, h + 1);
-                }
-            }
+            //        g.DrawImage(image: img,
+            //            srcRect: rectSRC,
+            //            destRect: rectDST,
+            //            srcUnit: GraphicsUnit.Pixel);
+            //        //g.DrawImage(img, pz.imageX, pz.imageY, w + 1, h + 1);
+            //    }
+            //}
         }
 
         private enum EstimateProp
@@ -224,7 +225,7 @@ namespace PixelStacker.WF.Components
             this.InitialDragPoint = e.Location;
             this.PanZoomSettings.initialImageX = this.PanZoomSettings.imageX;
             this.PanZoomSettings.initialImageY = this.PanZoomSettings.imageY;
-            this.Cursor = new Cursor(Resources.UIResources.cursor_handclosed.GetHicon());
+            this.Cursor = new Cursor(typeof(Resources.UIResources), nameof(Resources.UIResources.cursor_handclosed));
             this.IsDragging = true;
         }
 

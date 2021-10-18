@@ -29,7 +29,7 @@ namespace PixelStacker.Logic.IO.Formatters
                     {
                         UniquePaletteIDs.Add(tile.PaletteID);
                         sb.Append($" .mc{tile.PaletteID} {{");
-                        var bmTile = canvas.MaterialPalette[tile.PaletteID].GetImage(canvas.CanvasData.IsSideView);
+                        var bmTile = canvas.MaterialPalette[tile.PaletteID].GetImage(canvas.IsSideView);
 
                         using (MemoryStream ms = new MemoryStream())
                         {

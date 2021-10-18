@@ -24,7 +24,7 @@ namespace PixelStacker.Logic.Collections.ColorMapper
             B = b;
         }
 
-        public FloodFillNode(int PaletteID, MaterialCombination mc, Color c)
+        public FloodFillNode(int PaletteID, MaterialCombination mc, ColorData c)
         {
             this.PaletteID = PaletteID;
             Value = mc;
@@ -121,7 +121,7 @@ namespace PixelStacker.Logic.Collections.ColorMapper
                 return false;
 
             // BATTLE TIME
-            Color c = Color.FromArgb(255, node.R, node.G, node.B);
+            ColorData c = ColorData.FromArgb(255, node.R, node.G, node.B);
             long distExisting = c.GetAverageColorDistance(Palette[existing.Value].GetColorsInImage(this.IsSideView));
             long distNew = c.GetAverageColorDistance(node.Value.GetColorsInImage(this.IsSideView));
             if (distNew >= distExisting) return false;
@@ -132,7 +132,7 @@ namespace PixelStacker.Logic.Collections.ColorMapper
 
         #region TRASH2
 
-        public MaterialCombination FindBestMatch(Color c)
+        public MaterialCombination FindBestMatch(ColorData c)
         {
             if (c.A < 32) return Palette[Constants.MaterialCombinationIDForAir]; // AIR
 
@@ -156,7 +156,7 @@ namespace PixelStacker.Logic.Collections.ColorMapper
         /// <param name="c"></param>
         /// <param name="maxMatches"></param>
         /// <returns></returns>
-        public List<MaterialCombination> FindBestMatches(Color c, int maxMatches)
+        public List<MaterialCombination> FindBestMatches(ColorData c, int maxMatches)
         {
             var found = Combos.OrderBy(x => c.GetAverageColorDistance(x.GetColorsInImage(this.IsSideView)))
                 .Take(maxMatches).ToList();

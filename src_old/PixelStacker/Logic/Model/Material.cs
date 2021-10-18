@@ -207,29 +207,6 @@ namespace PixelStacker.Logic
             }
         }
 
-        public int getAverageColorError(bool isSide)
-        {
-
-            if (isSide)
-            {
-                if (_averageColorErrorSide == null)
-                {
-                    Color cAvg = this.getAverageColor(this.SideImage);
-                    _averageColorErrorSide = cAvg.GetColorDistanceAveragePerPixel(this.SideImage);
-                }
-                return _averageColorErrorSide.Value;
-            }
-            else
-            {
-                if (_averageColorError == null)
-                {
-                    Color cAvg = this.getAverageColor(this.TopImage);
-                    _averageColorError = cAvg.GetColorDistanceAveragePerPixel(this.TopImage);
-                }
-                return _averageColorError.Value;
-            }
-        }
-
         public Color getAverageColor(bool isSide)
         {
             if (isSide)

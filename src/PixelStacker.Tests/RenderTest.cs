@@ -1,10 +1,10 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PixelStacker.Extensions;
 using PixelStacker.IO.Config;
-using PixelStacker.IO.Formatters;
 using PixelStacker.Logic.Collections.ColorMapper;
 using PixelStacker.Logic.Engine;
 using PixelStacker.Logic.Engine.Quantizer.Enums;
+using PixelStacker.Logic.IO.Formatters;
 using PixelStacker.Logic.Model;
 using PixelStacker.Resources;
 using PixelStacker.Resources.Localization;
@@ -43,7 +43,7 @@ namespace PixelStacker.Tests
             mapper.SetSeedData(combos, palette, false);
 
             var canvas = await engine.RenderCanvasAsync(null, ref img, mapper, palette);
-            await new PixelStackerProjectFormatter().ExportAsync("Test.zip", canvas, null);
+            await new PixelStackerProjectFormatter().ExportAsync("Test.pxlzip", canvas, null);
         }
     }
 }

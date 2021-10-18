@@ -1,9 +1,9 @@
 ﻿using Newtonsoft.Json;
 using PixelStacker.Extensions;
 using PixelStacker.IO.JsonConverters;
+using SkiaSharp;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
 
 namespace PixelStacker.Logic.Model
@@ -34,31 +34,32 @@ namespace PixelStacker.Logic.Model
         public Material Top { get; }
         public Material Bottom { get; }
 
-        private Color? _GetAverageColorSide;
-        private Color? _GetAverageColorTop;
-        public Color GetAverageColor(bool isSide)
+        private ColorData? _GetAverageColorSide;
+        private ColorData? _GetAverageColorTop;
+        public ColorData GetAverageColor(bool isSide)
         {
             if (isSide)
             {
                 _GetAverageColorSide ??= SideImage.GetAverageColor();
-                return _GetAverageColorSide.Value;
+                return _GetAverageColorSide;
             }
             else
             {
                 _GetAverageColorTop ??= TopImage.GetAverageColor();
-                return _GetAverageColorTop.Value;
+                return _GetAverageColorTop;
             }
         }
 
-        private List<Tuple<Color, int>> _ColorsInImageSide;
-        private List<Tuple<Color, int>> _ColorsInImageTop;
-        public List<Tuple<Color, int>> GetColorsInImage(bool isSide)
+        private List<Tuple<ColorData, int>> _ColorsInImageSide;
+        private List<Tuple<ColorData, int>> _ColorsInImageTop;
+        public List<Tuple<ColorData, int>> GetColorsInImage(bool isSide)
         {
             if (isSide)
             {
+                System.Drawing.Color c;
                 _ColorsInImageSide ??= SideImage.GetColorsInImage()
                     .GroupBy(x => x)
-                    .Select(x => new Tuple<Color, int>(x.Key, x.Count()))
+                    .Select(x => new Tuple<ColorData, int>(x.Key, x.Count()))
                     .ToList();
                 return _ColorsInImageSide;
             }
@@ -66,16 +67,16 @@ namespace PixelStacker.Logic.Model
             {
                 _ColorsInImageTop ??= TopImage.GetColorsInImage()
                     .GroupBy(x => x)
-                    .Select(x => new Tuple<Color, int>(x.Key, x.Count()))
+                    .Select(x => new Tuple<ColorData, int>(x.Key, x.Count()))
                     .ToList();
                 return _ColorsInImageTop;
             }
         }
 
-        public Bitmap GetImage(bool isSide) => isSide ? this.SideImage : this.TopImage;
+        public SKBitmap GetImage(bool isSide) => isSide ? this.SideImage : this.TopImage;
         
-        private Bitmap _TopImage;
-        public Bitmap TopImage
+        private SKBitmap _TopImage;
+        public SKBitmap TopImage
         {
             get
             {
@@ -95,8 +96,8 @@ namespace PixelStacker.Logic.Model
             }
         }
 
-        private Bitmap _SideImage;
-        public Bitmap SideImage
+        private SKBitmap _SideImage;
+        public SKBitmap SideImage
         {
             get
             {

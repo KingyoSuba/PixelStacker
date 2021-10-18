@@ -2,7 +2,6 @@
 using PixelStacker.Logic.Model;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
-using PixelStacker.IO.Formatters;
 using PixelStacker.Extensions;
 using PixelStacker.Resources;
 using PixelStacker.Logic.Engine;
@@ -11,6 +10,7 @@ using PixelStacker.Logic.Collections.ColorMapper;
 using System.Linq;
 using PixelStacker.IO.Config;
 using System.Collections.Generic;
+using PixelStacker.Logic.IO.Formatters;
 
 namespace PixelStacker.Tests
 {
@@ -101,8 +101,8 @@ namespace PixelStacker.Tests
         public async Task IE_PixelStackerProjectFormat()
         {
             var formatter = new PixelStackerProjectFormatter();
-            await formatter.ExportAsync("io_test.zip", Canvas, null);
-            var canv = await formatter.ImportAsync("io_test.zip", null);
+            await formatter.ExportAsync("io_test.pxlzip", Canvas, null);
+            var canv = await formatter.ImportAsync("io_test.pxlzip", null);
             Assert.AreEqual(Canvas.WorldEditOrigin, canv.WorldEditOrigin);
             Assert.AreEqual(JsonConvert.SerializeObject(Canvas.MaterialPalette), JsonConvert.SerializeObject(canv.MaterialPalette));
             Assert.AreEqual(Canvas.PreprocessedImage.Height, canv.PreprocessedImage.Height);

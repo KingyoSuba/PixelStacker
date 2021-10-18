@@ -1,6 +1,8 @@
 ﻿using PixelStacker.Extensions;
 using PixelStacker.IO.Config;
+using PixelStacker.Logic.Model;
 using PixelStacker.Resources;
+using SkiaSharp;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -19,8 +21,8 @@ namespace PixelStacker.Logic
         public string Label { get; set; }
         public int BlockID { get; set; }
         public int Data { get; set; }
-        public Bitmap SideImage { get; private set; }
-        public Bitmap TopImage { get; private set; }
+        public SKBitmap SideImage { get; private set; }
+        public SKBitmap TopImage { get; private set; }
         public string Category { get; set; }
         public string SchematicaMaterialName { get; set; }
         public bool IsAdvanced { get; set; } = false;
@@ -35,8 +37,8 @@ namespace PixelStacker.Logic
         /// </summary>
         private string SideBlockName { get; set; }
 
-        private Color? _averageColor = null;
-        private Color? _averageColorSide = null;
+        private ColorData _averageColor = null;
+        private ColorData _averageColorSide = null;
 
         /// <summary>
         /// List of words or phrases ppl can search for to get these materials
@@ -65,7 +67,7 @@ namespace PixelStacker.Logic
             }
         }
 
-        public Material(string minMcVersion, bool isAdvancedMaterial, string category, string pixelStackerID, string label, int blockID, int data, Bitmap topImage, Bitmap sideImage, string topBlockName, string sideBlockName, string schematicaMaterialName)
+        public Material(string minMcVersion, bool isAdvancedMaterial, string category, string pixelStackerID, string label, int blockID, int data, byte[] topImage, byte[] sideImage, string topBlockName, string sideBlockName, string schematicaMaterialName)
         {
             this.MinimumSupportedMinecraftVersion = minMcVersion;
             this.IsAdvanced = isAdvancedMaterial;
@@ -73,69 +75,12 @@ namespace PixelStacker.Logic
             this.Label = label;
             this.BlockID = blockID;
             this.Data = data;
-            this.TopImage = topImage.To32bppBitmap();
-            this.SideImage = (sideImage ?? topImage).To32bppBitmap();
+            this.TopImage = topImage.AsBitmap();
+            this.SideImage = (sideImage ?? topImage).AsBitmap();
             this.Category = category;
             this.TopBlockName = topBlockName;
             this.SideBlockName = sideBlockName;
             this.SchematicaMaterialName = schematicaMaterialName;
-        }
-
-        public string ToConstructorString()
-        {
-            ResourceSet resources = Textures.ResourceManager.GetResourceSet(CultureInfo.CurrentCulture, false, true);
-            DictionaryEntry? topImageResource = null;
-            DictionaryEntry? sideImageResource = null;
-
-            foreach (DictionaryEntry resource in resources)
-            {
-                if (resource.Value is Bitmap)
-                {
-                    if (topImageResource == null)
-                    {
-                        if ((resource.Value as Bitmap).AreEqual(this.TopImage))
-                        {
-                            topImageResource = resource;
-                        }
-                    }
-
-                    if (sideImageResource == null)
-                    {
-                        if ((resource.Value as Bitmap).AreEqual(this.SideImage))
-                        {
-                            sideImageResource = resource;
-                        }
-                    }
-                }
-            }
-
-            if (topImageResource == null)
-            {
-                throw new Exception("Top image not found in list");
-            }
-
-            if (sideImageResource == null)
-            {
-                throw new Exception("Side image not found in list");
-            }
-
-            string topBlockName = this.TopBlockName.Replace("minecraft:" + topImageResource.Value.Key.ToString(), "minecraft:{nameof(Textures." + topImageResource.Value.Key.ToString() + ")}");
-            string sideBlockName = this.SideBlockName.Replace("minecraft:" + topImageResource.Value.Key.ToString(), "minecraft:{nameof(Textures." + topImageResource.Value.Key.ToString() + ")}");
-       
-            return $"new Material("
-                + $"\"{this.MinimumSupportedMinecraftVersion}\", "
-                + $"{this.IsAdvanced.ToString().ToLowerInvariant()}, "
-                + $"\"{this.Category}\", "
-                + $"\"{this.PixelStackerID}\", "
-                + $"\"{this.Label}\", "
-                + $"{this.BlockID}, "
-                + $"{this.Data}, "
-                + $"Textures.{topImageResource.Value.Key}, "
-                + $"Textures.{sideImageResource.Value.Key}, "
-                + $"$\"{topBlockName}\", "
-                + $"$\"{sideBlockName}\", "
-                + $"\"{this.SchematicaMaterialName}\""
-                + "),";
         }
 
         private string SettingsKey { get { return string.Format("BLOCK_{0}", this.PixelStackerID); } }
@@ -237,7 +182,7 @@ namespace PixelStacker.Logic
             return isSide ? this.SideBlockName : this.TopBlockName;
         }
 
-        public Bitmap GetImage(bool isSide)
+        public SKBitmap GetImage(bool isSide)
         {
             if (isSide)
             {
@@ -248,8 +193,8 @@ namespace PixelStacker.Logic
                 return this.TopImage;
             }
         }
-        
-        public Color GetAverageColor(bool isSide)
+
+        public ColorData GetAverageColor(bool isSide)
         {
             if (isSide)
             {
@@ -257,7 +202,7 @@ namespace PixelStacker.Logic
                 {
                     _averageColorSide = GetAverageColor(this.SideImage);
                 }
-                return _averageColorSide.Value;
+                return _averageColorSide;
             }
             else
             {
@@ -265,11 +210,11 @@ namespace PixelStacker.Logic
                 {
                     _averageColor = GetAverageColor(this.TopImage);
                 }
-                return _averageColor.Value;
+                return _averageColor;
             }
         }
 
-        private Color GetAverageColor(Bitmap src, int rgbFragmentSize = 1)
+        private ColorData GetAverageColor(SKBitmap src, int rgbFragmentSize = 1)
         {
             long r = 0;
             long g = 0;
@@ -277,12 +222,12 @@ namespace PixelStacker.Logic
             long a = 0;
             long total = src.Width * src.Height;
 
-            src.ToViewStreamParallel(null, (int x, int y, Color c) =>
+            src.ToViewStream(null, (int x, int y, ColorData c) =>
             {
-                Interlocked.Add(ref r, c.R);
-                Interlocked.Add(ref g, c.G);
-                Interlocked.Add(ref b, c.B);
-                Interlocked.Add(ref a, c.A);
+                r += c.R;
+                g += c.G;
+                b += c.B;
+                a += c.A;
             });
 
             r /= total;
@@ -293,9 +238,10 @@ namespace PixelStacker.Logic
             if (a > 128)
             {
                 a = 255;
-            }
+            } 
 
-            return Color.FromArgb((int)a, (int)r, (int)g, (int)b).Normalize(rgbFragmentSize);
+            ColorData cd = new ColorData(new SKColor((byte)r, (byte)g, (byte)b, (byte)a));
+            return cd.Normalize(rgbFragmentSize);
         }
 
         public override string ToString()

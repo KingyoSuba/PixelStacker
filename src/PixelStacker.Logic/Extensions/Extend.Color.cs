@@ -1,4 +1,5 @@
 ﻿using PixelStacker.IO.Config;
+using SkiaSharp;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -50,113 +51,8 @@ namespace PixelStacker.Extensions
             return Color.FromArgb((int)a, (int)r, (int)g, (int)b);
         }
 
-        public static float GetDegreeDistance(float alpha, float beta)
-        {
-            float phi = Math.Abs(beta - alpha) % 360;       // This is either the distance or 360 - distance
-            float distance = phi > 180 ? 360 - phi : phi;
-            return distance;
-        }
 
-        public static double GetDegreeDistance(double alpha, double beta)
-        {
-            double phi = Math.Abs(beta - alpha) % 360;       // This is either the distance or 360 - distance
-            double distance = phi > 180 ? 360 - phi : phi;
-            return distance;
-        }
 
-        /// <summary>
-        /// Use for SUPER accurate color distance checks. Very slow, but also very accurate.
-        /// </summary>
-        /// <param name="target"></param>
-        /// <param name="src"></param>
-        /// <returns></returns>
-        public static int GetAverageColorDistance(this Color target, List<Tuple<Color, int>> src)
-        {
-            long r = 0;
-            long t = 0;
-
-            foreach(var c in src)
-            {
-                int dist = target.GetColorDistance(c.Item1);
-                r += dist * c.Item2;
-                t += c.Item2;
-            }
-
-            r /= t;
-            return (int)r;
-        }
-
-        /// <summary>
-        /// Use for SUPER accurate color distance checks. Very slow, but also very accurate.
-        /// </summary>
-        /// <param name="target"></param>
-        /// <param name="src"></param>
-        /// <returns></returns>
-        public static long GetAverageColorDistance(this Color target, Bitmap src)
-        {
-            long r = 0;
-            long total = src.Width * src.Height;
-
-            src.ToViewStreamParallel(null, (int x, int y, Color c) =>
-            {
-                int dist = target.GetColorDistance(c);
-                Interlocked.Add(ref r, dist);
-            });
-
-            r /= total;
-            return (int)r;
-        }
-
-        /// <summary>
-        /// Custom color matching algorithm
-        /// </summary>
-        /// <param name="c"></param>
-        /// <returns></returns>
-        public static int GetColorDistance(this Color c, Color toMatch)
-        {
-            int dR = (c.R - toMatch.R);
-            int dG = (c.G - toMatch.G);
-            int dB = (c.B - toMatch.B);
-            int dHue = (int)GetDegreeDistance(c.GetHue(), toMatch.GetHue());
-
-            int diff = (
-                (dR * dR)
-                + (dG * dG)
-                + (dB * dB)
-                + (int)(Math.Sqrt(dHue * dHue * dHue))
-                );
-
-            return diff;
-        }
-
-        public static Color Normalize(this Color c, int fragmentSize)
-        => NormalizeActual(c, fragmentSize);
-
-        [Obsolete("Stop using this one.", false)]
-        public static Color Normalize(this Color c)
-        => NormalizeActual(c, null);
-
-        /// <summary>
-        /// Does not normalize alpha channels
-        /// </summary>
-        /// <param name="c"></param>
-        /// <returns></returns>
-        public static Color NormalizeActual(this Color c, int? fragmentSize = null)
-        {
-#pragma warning disable CS0618 // Type or member is obsolete
-            int F = fragmentSize ?? Options.Get.Preprocessor.RgbBucketSize;
-#pragma warning restore CS0618 // Type or member is obsolete
-            if (F < 2)
-            {
-                return c;
-            }
-
-            int R = (int)Math.Min(255, Math.Round(Convert.ToDecimal(c.R) / F, 0) * F);
-            int G = (int)Math.Min(255, Math.Round(Convert.ToDecimal(c.G) / F, 0) * F);
-            int B = (int)Math.Min(255, Math.Round(Convert.ToDecimal(c.B) / F, 0) * F);
-
-            return Color.FromArgb(c.A, R, G, B);
-        }
 
         public static IEnumerable<Color> OrderByColor(this IEnumerable<Color> source)
         {

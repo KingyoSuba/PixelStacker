@@ -12,7 +12,6 @@ namespace PixelStacker.Logic.Model
 {
     public class CanvasData: IEnumerable<CanvasIteratorData>
     {
-        public bool IsSideView { get; set; } = false;
         private int[,] BlocksMap { get; set; } // X, Y
         public int Width { get; }
         public int Height { get; }
@@ -128,7 +127,8 @@ namespace PixelStacker.Logic.Model
                 worker?.SafeThrowIfCancellationRequested();
                 for (int y = 0; y < mHeight; y++)
                 {
-                    canvas.BlocksMap[x, y] = bm.GetPixel(x, y).ToArgb();
+                    var px = bm.GetPixel(x, y);
+                    canvas.BlocksMap[x, y] = px.ToArgb();
                 }
             }
 

@@ -16,7 +16,7 @@ namespace PixelStacker.Logic.Collections.ColorMapper
         public double AccuracyRating => 99.127;
         public double SpeedRating => 232.1;
 
-        private Dictionary<Color, MaterialCombination> Cache { get; set; } = new Dictionary<Color, MaterialCombination>();
+        private Dictionary<ColorData, MaterialCombination> Cache { get; set; } = new Dictionary<ColorData, MaterialCombination>();
 
         private bool IsSideView;
         private MaterialPalette Palette;
@@ -28,7 +28,7 @@ namespace PixelStacker.Logic.Collections.ColorMapper
             lock (Padlock)
             {
                 this.Cache = null;
-                this.Cache = new Dictionary<Color, MaterialCombination>();
+                this.Cache = new Dictionary<ColorData, MaterialCombination>();
                 this.IsSideView = isSideView;
                 this.Palette = palette;
                 this.KdTree = new KdTree<float, MaterialCombination>(3, new KdTree.Math.FloatMath());
@@ -42,7 +42,7 @@ namespace PixelStacker.Logic.Collections.ColorMapper
             }
         }
 
-        public MaterialCombination FindBestMatch(Color c)
+        public MaterialCombination FindBestMatch(ColorData c)
         {
             lock (Padlock)
             {
@@ -65,7 +65,7 @@ namespace PixelStacker.Logic.Collections.ColorMapper
         /// <param name="c"></param>
         /// <param name="maxMatches"></param>
         /// <returns></returns>
-        public List<MaterialCombination> FindBestMatches(Color c, int maxMatches)
+        public List<MaterialCombination> FindBestMatches(ColorData c, int maxMatches)
         {
             lock (Padlock)
             {

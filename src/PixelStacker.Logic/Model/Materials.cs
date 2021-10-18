@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using PixelStacker.Logic.Model;
 using PixelStacker.Resources;
 
 namespace PixelStacker.Logic
@@ -427,7 +428,7 @@ namespace PixelStacker.Logic
             }
         }
 
-        private static void AddTagsForColor(Color c, ref List<string> tags)
+        private static void AddTagsForColor(ColorData c, ref List<string> tags)
         {
             if (c.A < 240 || c.A < 240) { tags.Add("transparent"); } else { tags.Add("opaque"); }
             var hue = c.GetHue();

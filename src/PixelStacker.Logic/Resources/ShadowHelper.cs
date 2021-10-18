@@ -1,5 +1,7 @@
-﻿using PixelStacker.Logic;
+﻿using PixelStacker.Extensions;
+using PixelStacker.Logic;
 using PixelStacker.Resources;
+using SkiaSharp;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -58,42 +60,56 @@ namespace PixelStacker.Properties
 
     public static class ShadowHelper
     {
-        public static System.Drawing.Bitmap GetSpriteSheet(int textureSize)
+        public static SKBitmap GetSpriteSheet(int textureSize)
         {
             string resourceKey = $"sprite_x{textureSize}";
-            return Shadows.ResourceManager.GetObject(resourceKey) as System.Drawing.Bitmap;
+            return SKBitmap.Decode(Shadows.ResourceManager.GetObject(resourceKey) as byte[]);
         }
 
 
         const int NUM_SHADE_TILES_X = 8;
-        public static Rectangle GetSpriteRect(int textureSize, ShadeFrom dir)
+        
+        public static SKRect GetSpriteRect(int textureSize, ShadeFrom dir)
         {
-            int numDir = (int) dir;
+            int numDir = (int)dir;
             int xOffset = textureSize * (numDir % NUM_SHADE_TILES_X);
             int yOffset = textureSize * (numDir / NUM_SHADE_TILES_X);
-
-            return new Rectangle(x: xOffset, y: yOffset, width: textureSize, height: textureSize);
+            return new SKRect(xOffset, yOffset, xOffset + textureSize, yOffset + textureSize);    
         }
 
-        private static Bitmap[] shadowSprites = new Bitmap[256];
-        public static Bitmap GetSpriteIndividual(int textureSize, ShadeFrom dir)
+        //public static SKRect GetSpriteRect(int textureSize, ShadeFrom dir)
+        //{
+        //    int numDir = (int)dir;
+        //    int xOffset = textureSize * (numDir % NUM_SHADE_TILES_X);
+        //    int yOffset = textureSize * (numDir / NUM_SHADE_TILES_X);
+
+        //    return new Rectangle(x: xOffset, y: yOffset, width: textureSize, height: textureSize);
+        //}
+
+        private static SKBitmap[] shadowSprites = new SKBitmap[256];
+        [Obsolete("Recheck reneder code")]
+        public static SKBitmap GetSpriteIndividual(int textureSize, ShadeFrom dir)
         {
             int numDir = (int) dir;
             if (shadowSprites[numDir] == null)
             {
                 var bmShadeSprites = ShadowHelper.GetSpriteSheet(textureSize);
-                var rectDST = new Rectangle(0, 0, textureSize, textureSize);
+                var rectDST = new SKRect(0, 0, textureSize, textureSize);
 
                 for (int i = 0; i < 256; i++)
                 {
                     var rectSRC = GetSpriteRect(textureSize, (ShadeFrom) i);
-                    var bm = new Bitmap(textureSize, textureSize);
-                    using (Graphics g = Graphics.FromImage(bm))
+                    var bm = new SKBitmap(textureSize, textureSize);
+
+                    
+                    using (SKCanvas g = new SKCanvas(bm))
                     {
-                        g.DrawImage(image: bmShadeSprites,
-                            srcRect: rectSRC,
-                            destRect: rectDST,
-                            srcUnit: GraphicsUnit.Pixel);
+                        g.DrawImage(SKImage.FromBitmap(bmShadeSprites), rectSRC, rectDST);
+                        //g.DrawImage(image: bmShadeSprites,
+                        //    srcRect: rectSRC,
+                        //    destRect: rectDST,
+                        //    srcUnit: GraphicsUnit.Pixel);
+                        g.Save(); // 
                     }
 
                     shadowSprites[i] = bm;
@@ -103,7 +119,7 @@ namespace PixelStacker.Properties
             return shadowSprites[numDir];
         }
 
-        public static System.Drawing.Bitmap Get(int textureSize, ShadeDir direction)
+        public static SKBitmap Get(int textureSize, ShadeDir direction)
         {
             if (!Enum.IsDefined(typeof(ShadeRez), textureSize / 4))
             {
@@ -114,12 +130,12 @@ namespace PixelStacker.Properties
 
             try
             {
-                return Shadows.ResourceManager.GetObject(resourceKey) as System.Drawing.Bitmap;
+                return (Shadows.ResourceManager.GetObject(resourceKey) as byte[]).AsBitmap();
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex); // Allow debugging but still log to console
-                return Textures.air;
+                return Textures.air.AsBitmap();
             }
         }
     }

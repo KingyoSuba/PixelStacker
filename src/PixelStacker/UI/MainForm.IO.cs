@@ -13,18 +13,6 @@ namespace PixelStacker.UI
 {
     public partial class MainForm
     {
-        private List<IExportFormatter> ExportFormatters { get; set; } = new List<IExportFormatter>()
-        {
-            new PixelStackerProjectFormatter(),
-            new PngFormatter()
-        };
-
-        private List<IImportFormatter> ImportFormatters { get; set; } = new List<IImportFormatter>()
-        {
-            new PixelStackerProjectFormatter(),
-        };
-
-
         private async void saveAsToolStripMenuItem_Click(object sender, System.EventArgs e)
         {
             await TaskManager.Get.CancelTasks();
@@ -185,7 +173,7 @@ namespace PixelStacker.UI
         private async void LoadFileFromPath(string _path)
         {
             string ext = _path.Split('.', StringSplitOptions.RemoveEmptyEntries).LastOrDefault();
-            if (ext == ".pxlzip")
+            if (ext == "pxlzip")
             {
                 var self = this;
                 // pixelstacker project handling
@@ -198,11 +186,13 @@ namespace PixelStacker.UI
                     await self.InvokeEx(async c =>
                     {
                         c.ColorMapper.SetSeedData(proj.MaterialPalette.ToCombinationList()
-.Where(mc => mc.Bottom.IsVisibleF(Options) && mc.Top.IsVisibleF(Options))
-.Where(mc => mc.Bottom.IsEnabledF(Options) && mc.Top.IsEnabledF(Options))
-.ToList(), proj.MaterialPalette, Options.Preprocessor.IsSideView);
-                        await c.canvasEditor.SetCanvas(worker, proj, null);
+                        .Where(mc => mc.Bottom.IsVisibleF(Options) && mc.Top.IsVisibleF(Options))
+                        .Where(mc => mc.Bottom.IsEnabledF(Options) && mc.Top.IsEnabledF(Options))
+                        .ToList(), proj.MaterialPalette, Options.Preprocessor.IsSideView);
+                        await c.canvasEditor.SetCanvas(worker, proj, proj.PanZoomSettings);
+                        c.RenderedCanvas = proj;
                         c.ShowCanvasEditor();
+                        c.TS_OnRenderCanvas();
                     });
                 }));
             }
