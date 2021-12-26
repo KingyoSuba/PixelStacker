@@ -34,7 +34,7 @@ namespace PixelStacker.Logic.IO.Formatters
                 case ExportFormat.PngPreview:
                     return new PngPreviewFormatter();
                 case ExportFormat.BlockCountCsv:
-                    return new BlockCountCsvFormatter();
+                    return new CsvFormatter();
                 case ExportFormat.PixelStackerProject:
                     return new PixelStackerProjectFormatter();
                 case ExportFormat.Schematic:

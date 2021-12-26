@@ -57,7 +57,7 @@ namespace PixelStacker.UI
                         formatter = new SchematicFormatter();
                         break;
                     case "csv":
-                        formatter = new BlockCountCsvFormatter();
+                        formatter = new CsvFormatter();
                         break;
                     default:
                         throw new NotSupportedException($"That file format is not supported. Given: {ext}");
