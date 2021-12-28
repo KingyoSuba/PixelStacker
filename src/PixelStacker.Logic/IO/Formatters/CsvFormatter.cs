@@ -41,22 +41,24 @@ namespace PixelStacker.Logic.IO.Formatters
                     materialCounts[mc.Top] = materialCounts.TryGetValue(mc.Top, out int existingT) ? existingT + addTop : addTop;
                     materialCounts[mc.Bottom] = materialCounts.TryGetValue(mc.Bottom, out int existingB) ? existingB + addBottom : addBottom;
                 }
-                sb1.AppendLine(String.Join(",", list1));
-                sb2.AppendLine(String.Join(",", list2));
+                sb1.AppendLine(String.Join(";", list1));
+                sb2.AppendLine(String.Join(";", list2));
             }
+            sb.AppendLine("\"sep=;\"");
             sb.AppendLine("Top");
             sb.Append(sb1);
+
             sb.AppendLine("Bottom");
             sb.Append(sb2);
 
+            sb.AppendLine("Count");
+            sb.AppendLine("\"Material\";\"Block Count\";\"Full Stacks needed\"");
+            sb.AppendLine("\"Total\"," + materialCounts.Values.Sum());
 
-            //sb.AppendLine("\"Material\",\"Block Count\",\"Full Stacks needed\"");
-            //sb.AppendLine("\"Total\"," + materialCounts.Values.Sum());
-
-            //foreach (var kvp in materialCounts.OrderByDescending(x => x.Value))
-            //{
-            //    sb.AppendLine($"\"{kvp.Key.GetBlockNameAndData(isv).Replace("\"", "\"\"")}\",{kvp.Value},{kvp.Value / 64} stacks and {kvp.Value % 64} remaining blocks");
-            //}
+            foreach (var kvp in materialCounts.OrderByDescending(x => x.Value))
+            {
+                sb.AppendLine($"\"{kvp.Key.GetBlockNameAndData(isv).Replace("\"", "\"\"")}\";{kvp.Value};{kvp.Value / 64} stacks and {kvp.Value % 64} remaining blocks");
+            }
 
             byte[] result = Encoding.UTF8.GetBytes(sb.ToString());
             return Task.FromResult(result);
